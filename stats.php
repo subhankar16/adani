@@ -136,3 +136,87 @@ $tseptions=array_map(function($item){
 		</div>
 	</div>
 </div>
+<div class="row">
+	<div class="col-sm-6">
+		<!-- start: RESPONSIVE ICONS BUTTONS PANEL -->
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<i class="fa fa-external-link-square"></i>
+				Overall Summary
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Total Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Super Active Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Active Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Total TSE</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Stagnant Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Dormant Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Total Entry</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Inactive Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="btn btn-icon btn-block">
+							<div>500</div>
+							<div>Deactivated Contractors</div> 
+							<div>ACL : 200 | ACC : 300</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end: RESPONSIVE ICONS BUTTONS PANEL -->
+</div>
+

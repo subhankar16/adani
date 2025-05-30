@@ -1,7 +1,7 @@
 <?php
-$servername = "localhost";
+$servername = "localhost:8889";
 $username = "root";
-$password = "";
+$password = "root";
 
 try {
   $conn = new PDO("mysql:host=$servername;dbname=devadani", $username, $password);
@@ -13,6 +13,10 @@ try {
   echo "Connection failed: " . $e->getMessage();
   die;
 }
+
+//echo phpinfo();
+//print_r($_GET);die();
+//list($zonesid) = array_values($_GET);
 
 
 $zones = $conn->query("SELECT id,zone_name FROM dcm_zones where is_active='1'")->fetchAll(PDO::FETCH_ASSOC);
@@ -44,6 +48,8 @@ $tse = $conn->query("SELECT dcm_contact_id,full_name,adid,mobile FROM dcm_tse_wi
 $tseptions=array_map(function($item){
 	return '<option value="'.$item['dcm_contact_id'].'">'.$item['full_name'].'[ADID: '.$item['adid'].' | Mobile: '.$item['mobile'].'] </option>';
 }, $tse);
+
+
 
 // $channelParterTypes = $conn->query("SELECT id,name FROM dcm_hierarchies where id in (9,10,11,12,13,14)")->fetchAll(PDO::FETCH_ASSOC);
 // $channelParterTypeptions=array_map(function($item){

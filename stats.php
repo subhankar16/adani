@@ -1,13 +1,72 @@
-<script type="text/javascript">
-	document.addEventListener("DOMContentLoaded", function() { 
-		//document.querySelectorALL('#analytics-filter select').each(function())
-	});
-</script>
 <?php 
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 $base_url="http://".$_SERVER['HTTP_HOST'].dirname($_SERVER["REQUEST_URI"].'?').'/';
 include('model.php');?>
+<script type="text/javascript">
+	/*$(function() { 
+		var zonelocation=JSON.parse('');
+		console.log(zonelocation);
+		 $('#analytics-filter select').change(function(){
+			var v=$(this).val();
+			var n=$(this).attr('name');
+			var selectZoneMap=[{}];
+
+			var zones=[];
+			var sales_units=[];
+			var sales_offices=[];
+			var states=[];
+			var districts=[];
+			var talukas=[];
+			var tse=[];
+			switch(n){
+				case 'zones':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_zone_id==v) : zonelocation;
+				break;
+				case 'sales_units':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_sales_units_id==v) : zonelocation;
+				break;
+				case 'sales_offices':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_sales_offices_id==v) : zonelocation;
+				break;
+				case 'states':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_state_id==v) : zonelocation;
+				break;
+				case 'districts':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_district_id==v) : zonelocation;
+				break;
+				case 'talukas':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_talukas_id==v) : zonelocation;
+				break;
+				case 'tse':
+					 selectZoneMap = v ? zonelocation.filter(record=>record.dcm_contact_id==v) : zonelocation;
+				break;
+			}
+
+			if(selectZoneMap.length > 0){
+				selectZoneMap.forEach(function(item){
+					zones.push({id:item.dcm_zone_id,name:item.zone_name,selected:n=='zones' ? v : ''});
+					sales_units.push({id:item.dcm_sales_units_id,name:item.sales_unit_name,selected:n=='sales_units' ? v : ''});
+					sales_offices.push({id:item.dcm_sales_offices_id,name:item.sales_office_name,selected:n=='sales_offices' ? v : ''});
+					states.push({id:item.dcm_state_id,name:item.state_name,selected:n=='states' ? v : ''});
+					districts.push({id:item.dcm_district_id,name:item.district_name,selected:n=='districts' ? v : ''});
+					talukas.push({id:item.dcm_talukas_id,name:item.taluka_name,selected:n=='talukas' ? v : ''});
+					tse.push({id:item.dcm_contact_id,name:item.full_name+'[ADID: '+item.adid+' | Mobile: '+item.mobile+']',selected:n=='tse' ? v : ''});
+				})
+				zones= Array.from(new Set(zones.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+				sales_units=Array.from(new Set(sales_units.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+				sales_offices=Array.from(new Set(sales_offices.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+				states=Array.from(new Set(states.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+				districts=Array.from(new Set(districts.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+				talukas=Array.from(new Set(talukas.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+				tse=Array.from(new Set(tse.map(o => JSON.stringify(o)))).map(str => JSON.parse(str));
+
+				
+			}
+			
+		});
+	});*/
+</script>
 <link rel="stylesheet" href="<?=$base_url?>dash.css"></link>
 <div class="row">
 	<div class="col-sm-12">
@@ -18,7 +77,7 @@ include('model.php');?>
 				Filter
 			</div>
 			<div class="panel-body">
-				<form role="form" class="form-horizontal" id="analytics-filter">
+				<form role="form" class="form-horizontal" id="analytics-filter" method="get" >
 					<div class="form-group">
 						<div class="col-md-3 col-sm-6 col-lg-2">
 							<select id="zones" name="zones" class="form-control search-select">
@@ -64,8 +123,10 @@ include('model.php');?>
 								<?=($tse ? implode("",$tseptions):'')?>
 							</select>
 						</div>
-						<div class="make-switch" data-on-label="MTD" data-off-label="YTD">
-							<input type="checkbox" checked>
+						<div class="col-md-2 col-sm-3 col-lg-2">
+							<div class="make-switch" id="td" name="td" data-on-label="MTD" data-off-label="YTD" value="1">
+								<input type="checkbox" checked>
+							</div>
 						</div>
 						<!-- <div class="col-md-3 col-sm-6 col-lg-3">
 							<select id="tse" name="tse" class="form-control search-select">
@@ -78,6 +139,11 @@ include('model.php');?>
 								<option value="">All Channel Partners</option>
 							</select>
 						</div>  -->
+						<!-- <div class="col-md-2 col-sm-3 col-lg-2">
+							<button class="btn btn-blue next-step btn-block">
+								Submit
+							</button>
+						</div> -->
 					</div>
 				</form>
 				
@@ -179,7 +245,7 @@ include('model.php');?>
 						</div>
 						<div class="dbox__body">
 							<span class="dbox__count">Contractors Detail</span>
-							<span class="dbox__title"> Total <b><font color="#fff" size="18">500</font></b> Users</span>
+							<span class="dbox__title"> Total <b><font color="#fff" size="18"><?=digit_formatter($total_contractors['total'])?></font></b> Users</span>
 						</div>
 						
 						<!-- <div class="dbox__action">
@@ -187,11 +253,11 @@ include('model.php');?>
 						</div>	 -->
 						 <div class="dates">
 	                <div class="start">
-	                    <strong>Total ACC Contractors</strong> 200
+	                    <strong>Total ACC Contractors</strong> <?=digit_formatter($acc_total_contractors)?>
 	                    <span></span>
 	                </div>
 	                <div class="ends">
-	                    <strong>Total ACL Contractors</strong> 300
+	                    <strong>Total ACL Contractors</strong> <?=digit_formatter($acl_total_contractors)?>
 	                </div>
 	            </div>			
 					</div>
@@ -200,15 +266,37 @@ include('model.php');?>
 	            <div class="stats">
 
 	                <div>
-	                    <strong>Total Volume</strong> 3098
+	                    <strong>Total Volume</strong> <?=digit_formatter(round($total_volume_yearly))?> MT
+	                </div>
+					<div>
+	                    <strong>Total Vol.(ACC)</strong> <?=digit_formatter(round($total_volume_yearly_acc))?> MT
+	                </div>
+					<div>
+	                    <strong>Total Vol.(ACL)</strong> <?=digit_formatter(round($total_volume_yearly_acl))?> MT
+	                </div>
+
+	                <!-- <div>
+	                    <strong>Total TSE</strong> <?=digit_formatter(count($tse))?>
 	                </div>
 
 	                <div>
-	                    <strong>Total TSE</strong> 562
+	                    <strong>Total Entries</strong> <?=digit_formatter($total_entries['total'])?>
+	                </div> -->
+
+	            </div>
+
+	            <!-- <div class="stats">
+
+	                <div>
+	                    <strong>Total LoggedIn</strong> <?=digit_formatter($total_loggedIn['total'])?>
 	                </div>
 
 	                <div>
-	                    <strong>Total Entries</strong> 182
+	                    <strong>Total Points</strong> <?=digit_formatter(round($total_points['total']))?>
+	                </div>
+
+	                <div>
+	                    <strong>Productivity</strong> <?=round($total_volume_yearly/$total_contractors['total'])?>
 	                </div>
 
 	            </div>
@@ -216,34 +304,33 @@ include('model.php');?>
 	            <div class="stats">
 
 	                <div>
-	                    <strong>Total LoggedIn</strong> 3098
+	                    <strong>SuperActive</strong> <?=digit_formatter($total_superactive['total'])?>
 	                </div>
 
 	                <div>
-	                    <strong>Total Points</strong> 562
+	                    <strong>Active</strong> <?=digit_formatter($total_active['total'])?>
 	                </div>
 
 	                <div>
-	                    <strong>Productivity</strong> 182
+	                    <strong>Stagnant</strong> <?=digit_formatter($total_stag['total'])?>
 	                </div>
 
 	            </div>
-
-	            <div class="stats">
+				 <div class="stats">
 
 	                <div>
-	                    <strong>SuperActive</strong> 3098
+	                    <strong>This Mon. Enrol.</strong> <?=digit_formatter($total_superactive['total'])?>
 	                </div>
 
 	                <div>
-	                    <strong>Active</strong> 562
+	                    <strong>Active</strong> <?=digit_formatter($total_active['total'])?>
 	                </div>
 
 	                <div>
-	                    <strong>Stagnant</strong> 182
+	                    <strong>Stagnant</strong> <?=digit_formatter($total_stag['total'])?>
 	                </div>
 
-	            </div>
+	            </div> -->
 
 	           <!--  <div class="event-footer">
 	                <a href="#" class="Cbtn Cbtn-primary">View</a>

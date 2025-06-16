@@ -1,7 +1,7 @@
 <?php
-$servername = "localhost";
+$servername = "localhost:8889";
 $username = "root";
-$password = "";
+$password = "root";
 
 try {
   $conn = new PDO("mysql:host=$servername;dbname=devadani", $username, $password);
@@ -61,6 +61,10 @@ if($number_of_digits==8 ||$number_of_digits==9)
 return $fraction." ".$ext;
 }
 
+$filter=!empty($_GET) ? $_GET : array('zones'=>'','sales_units'=>'','sales_offices'=>'','states'=>'','districts'=>'','talukas'=>'','tse'=>'','td'=>'');
+
+//print_r($filter);exit;
+
 
 $zones = $conn->query("SELECT id,zone_name FROM dcm_zones where is_active='1'")->fetchAll(PDO::FETCH_ASSOC);
 $zoneoptions=array_map(function($item){
@@ -99,7 +103,7 @@ $tseptions=array_map(function($item){
 
 $zoneLocation=$conn->query("SELECT * FROM dcm_tse_wise_contractor_count_analytics;")->fetchAll(PDO::FETCH_ASSOC);
 
-$enrollmentSummary=$conn->query("SELECT esd.*,es.brand_id FROM `dcm_enrolment_summary` es left join dcm_enrolment_summary_details esd on esd.dcm_enrolment_summary_id=es.id where DATE(esd.created_at)=DATE('2025-06-02')")->fetchAll(PDO::FETCH_ASSOC);
+$enrollmentSummary=$conn->query("SELECT esd.*,es.brand_id FROM `dcm_enrolment_summary` es left join dcm_enrolment_summary_details esd on esd.dcm_enrolment_summary_id=es.id where DATE(esd.created_at)=DATE('2025-06-14')")->fetchAll(PDO::FETCH_ASSOC);
 
 
 
@@ -128,9 +132,30 @@ $monthly_sale_serialize_data=array_column($enrollmentSummary,'monthly_sale_seria
 $total_volume_yearly=array_sum(array_column($cumulative_sale_serialize_data,'Total'));
 $total_volume_monthly=array_sum(array_column($monthly_sale_serialize_data,'Total'));
 
+$total_loggedIn_Users=$conn->query("SELECT sf.dcm_contacts_id,zl.dcm_brand_id FROM `sf_guard_user` as sf left join `dcm_contacts` as  c on c.id=sf.dcm_contacts_id left join `dcm_zone_contact_mapping` as zc on zc.dcm_contact_id=sf.dcm_contacts_id left join `dcm_zone_location_mapping` as zl on zl.id=zc.dcm_zone_location_mapping_id where sf.dcm_hierarchies_id ='20' and sf.last_login is not NULL and c.is_deleted='0' and c.dcm_hierarchies_id='20' group by sf.dcm_contacts_id,zl.dcm_brand_id")->fetchAll(PDO::FETCH_ASSOC);
+
+echo '<pre>';
+print_r($total_loggedIn_Users);
+
+$total_loggedIn=count(array_unique(array_column($total_loggedIn_Users,'dcm_contact_id')));
+
+echo $total_loggedIn;die;
+
+$total_entries=$conn->query("SELECT count(*) as total FROM `contractor_purchase_report_data_backup`")->fetch(PDO::FETCH_ASSOC);
+
+$total_points=$conn->query("SELECT SUM(`total_credit_points`-`total_debit_points`) as total FROM `contractor_balance_sheet_data` WHERE `is_deleted_contractor`='0' and dcm_hierarchies_id_contractor ='20'")->fetch(PDO::FETCH_ASSOC);
+
+$total_superactive=$conn->query("SELECT count(DISTINCT dcm_contact_id_contractor) as total FROM `contractor_purchase_report_data_backup` where date(`purchase_date`) <= DATE_SUB(CURDATE(),INTERVAL 30 DAY) and `purchase_status`='Approved'")->fetch(PDO::FETCH_ASSOC);
+
+$total_active=$conn->query("SELECT count(DISTINCT dcm_contact_id_contractor) as total FROM `contractor_purchase_report_data_backup` where date(`purchase_date`) <= DATE_SUB(CURDATE(),INTERVAL 90 DAY) and date(`purchase_date`) >  DATE_SUB(CURDATE(),INTERVAL 30 DAY) and `purchase_status`='Approved';")->fetch(PDO::FETCH_ASSOC);
+
+$total_stag=$conn->query("SELECT count(DISTINCT dcm_contact_id_contractor) as total FROM `contractor_purchase_report_data_backup` where date(`purchase_date`) <= DATE_SUB(CURDATE(),INTERVAL 180 DAY) and date(`purchase_date`) >  DATE_SUB(CURDATE(),INTERVAL 90 DAY) and `purchase_status`='Approved';")->fetch(PDO::FETCH_ASSOC);
+
 //ACC
 
 $acc_array=array_filter($enrollmentSummary,function($item){return $item['brand_id']=='1'; });
+//echo '<pre>';
+//print_r($acc_array);exit;
 $acc_total_contractors=array_sum(array_column($acc_array,'total_contact_count'));
 
 $cumulative_sale_serialize_data_acc=array_column($acc_array,'cumulative_sale_serialize_data');
@@ -138,6 +163,8 @@ $monthly_sale_serialize_data_acc=array_column($acc_array,'monthly_sale_serialize
 
 $total_volume_yearly_acc=array_sum(array_column($cumulative_sale_serialize_data_acc,'Total'));
 $total_volume_monthly_acc=array_sum(array_column($monthly_sale_serialize_data_acc,'Total'));
+
+//$total_loggedIn_acc=$conn->query("SELECT count(*) as total FROM `sf_guard_user` as sf left join dcm_zone_contact_mapping zc on zc.dcm_contact_id=sf.dcm_contacts_id left join dcm_zone_location_mapping zl on zl.id=zc.dcm_zone_location_mapping_id where sf.dcm_hierarchies_id ='20' and sf.last_login is not NULL and zl.dcm_brand_id='1'")->fetch(PDO::FETCH_ASSOC);
 
 // ACL
 
@@ -147,18 +174,11 @@ $cumulative_sale_serialize_data_acl=array_column($acl_array,'cumulative_sale_ser
 $monthly_sale_serialize_data_acl=array_column($acl_array,'monthly_sale_serialize_data');
 $total_volume_yearly_acl=array_sum(array_column($cumulative_sale_serialize_data_acl,'Total'));
 $total_volume_monthly_acl=array_sum(array_column($monthly_sale_serialize_data_acl,'Total'));
+//$total_loggedIn_acl=$conn->query("SELECT count(*) as total FROM `sf_guard_user` as sf left join dcm_zone_contact_mapping zc on zc.dcm_contact_id=sf.dcm_contacts_id left join dcm_zone_location_mapping zl on zl.id=zc.dcm_zone_location_mapping_id where sf.dcm_hierarchies_id ='20' and sf.last_login is not NULL and zl.dcm_brand_id='2'")->fetch(PDO::FETCH_ASSOC);
 
 
 
-$total_entries=$conn->query("SELECT count(*) as total FROM `contractor_purchase_report_data`")->fetch(PDO::FETCH_ASSOC);
-$total_loggedIn=$conn->query("SELECT count(*) as total FROM `sf_guard_user` where dcm_hierarchies_id ='20' and last_login is not NULL")->fetch(PDO::FETCH_ASSOC);
-$total_points=$conn->query("SELECT SUM(`total_credit_points`-`total_debit_points`) as total FROM `contractor_balance_sheet_data` WHERE `is_deleted_contractor`='0' and dcm_hierarchies_id_contractor ='20'")->fetch(PDO::FETCH_ASSOC);
 
-$total_superactive=$conn->query("SELECT count(DISTINCT dcm_contact_id_contractor) as total FROM `contractor_purchase_report_data` where date(`purchase_date`) <= DATE_SUB(CURDATE(),INTERVAL 30 DAY) and `purchase_status`='Approved'")->fetch(PDO::FETCH_ASSOC);
-
-$total_active=$conn->query("SELECT count(DISTINCT dcm_contact_id_contractor) as total FROM `contractor_purchase_report_data` where date(`purchase_date`) <= DATE_SUB(CURDATE(),INTERVAL 90 DAY) and date(`purchase_date`) >  DATE_SUB(CURDATE(),INTERVAL 30 DAY) and `purchase_status`='Approved';")->fetch(PDO::FETCH_ASSOC);
-
-$total_stag=$conn->query("SELECT count(DISTINCT dcm_contact_id_contractor) as total FROM `contractor_purchase_report_data` where date(`purchase_date`) <= DATE_SUB(CURDATE(),INTERVAL 180 DAY) and date(`purchase_date`) >  DATE_SUB(CURDATE(),INTERVAL 90 DAY) and `purchase_status`='Approved';")->fetch(PDO::FETCH_ASSOC);
 
 //print_r($total_entries);die;
 
